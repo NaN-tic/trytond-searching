@@ -70,9 +70,6 @@ documentación técnica sobre los dominos.
 Ejemplos de condiciones
 -----------------------
 
-Terceros
---------
-
 * Ejemplo de perfil de terceros que se llamen "zikzakmedia" y que estén en la
 categoría de "Mantenimiento".
 
