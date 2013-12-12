@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!-- This file is part searching module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="ir.ui.icon" id="searching_icon">
+            <field name="name">tryton-searching</field>
+            <field name="path">icons/tryton-searching.svg</field>
+        </record>
+        <menuitem id="menu_searching" name="Searching" icon="tryton-searching"/>
+
+        <!-- access -->
+        <record model="ir.model.access" id="access_searching_profile">
+            <field name="model" search="[('model', '=', 'searching.profile')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.model.access" id="access_searching_profile_line">
+            <field name="model" search="[('model', '=', 'searching.profile.line')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- searching.profile -->
+        <record model="ir.ui.view" id="searching_profile_view_tree">
+            <field name="model">searching.profile</field>
+            <field name="type">tree</field>
+            <field name="name">searching_profile_tree</field>
+        </record>
+        <record model="ir.ui.view" id="searching_profile_view_form">
+            <field name="model">searching.profile</field>
+            <field name="type">form</field>
+            <field name="name">searching_profile_form</field>
+        </record>
+        <record model="ir.action.act_window" id="act_searching_profile_form">
+            <field name="name">Profile</field>
+            <field name="res_model">searching.profile</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_searching_profile_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="searching_profile_view_tree"/>
+            <field name="act_window" ref="act_searching_profile_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_searching_profile_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="searching_profile_view_form"/>
+            <field name="act_window" ref="act_searching_profile_form"/>
+        </record>
+        <menuitem parent="menu_searching" sequence="1"
+            action="act_searching_profile_form" id="menu_searching_profile_form"/>
+
+        <!-- searching.profile.line -->
+        <record model="ir.ui.view" id="searching_profile_line_tree_view">
+            <field name="model">searching.profile.line</field>
+            <field name="type">tree</field>
+            <field name="name">searching_profile_line_tree</field>
+        </record>
+
+        <!-- wizard -->
+        <record model="ir.ui.view" id="searching_start_view_form">
+            <field name="model">searching.start</field>
+            <field name="type">form</field>
+            <field name="name">searching_start_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="act_searching">
+            <field name="name">Searching</field>
+            <field name="wiz_name">searching</field>
+        </record>
+        <menuitem id="menu_act_searching"
+            parent="menu_searching" action="act_searching"/>
+
+        <!-- ir.model -->
+        <record model="ir.ui.view" id="model_form_view">
+            <field name="model">ir.model</field>
+            <field name="inherit" ref="ir.model_view_form"/>
+            <field name="name">model_form</field>
+        </record>
+    </data>
+</tryton>

@@ -1,0 +1,280 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "error:searching:"
+msgid "Error domain \"%s\""
+msgstr "Error dominio \"%s\""
+
+msgctxt "field:ir.model,searching_enabled:"
+msgid "Searching Enabled"
+msgstr "Activar búsqueda"
+
+msgctxt "field:searching.profile,condition:"
+msgid "Condition"
+msgstr "Condición"
+
+msgctxt "field:searching.profile,create_date:"
+msgid "Create Date"
+msgstr "Fecha creación"
+
+msgctxt "field:searching.profile,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:searching.profile,domain:"
+msgid "Domain"
+msgstr "Dominio"
+
+msgctxt "field:searching.profile,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:searching.profile,lines:"
+msgid "Lines"
+msgstr "Líneas"
+
+msgctxt "field:searching.profile,model:"
+msgid "Model"
+msgstr "Modelo"
+
+msgctxt "field:searching.profile,name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:searching.profile,profile_groups:"
+msgid "Groups"
+msgstr "Grupos"
+
+msgctxt "field:searching.profile,python_domain:"
+msgid "Python Domain"
+msgstr "Dominio Python"
+
+msgctxt "field:searching.profile,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:searching.profile,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:searching.profile,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:searching.profile-res.group,create_date:"
+msgid "Create Date"
+msgstr "Fecha creación"
+
+msgctxt "field:searching.profile-res.group,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:searching.profile-res.group,group:"
+msgid "Group"
+msgstr "Grupo"
+
+msgctxt "field:searching.profile-res.group,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:searching.profile-res.group,profile:"
+msgid "Profile"
+msgstr "Perfil"
+
+msgctxt "field:searching.profile-res.group,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:searching.profile-res.group,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:searching.profile-res.group,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+#, fuzzy
+msgctxt "field:searching.profile.line,condition:"
+msgid "Condition"
+msgstr "Condición"
+
+msgctxt "field:searching.profile.line,create_date:"
+msgid "Create Date"
+msgstr "Fecha creación"
+
+msgctxt "field:searching.profile.line,create_uid:"
+msgid "Create User"
+msgstr "Usuario creación"
+
+msgctxt "field:searching.profile.line,field:"
+msgid "Field"
+msgstr "Campo"
+
+msgctxt "field:searching.profile.line,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:searching.profile.line,operator:"
+msgid "Operator"
+msgstr "Operador"
+
+msgctxt "field:searching.profile.line,profile:"
+msgid "Profile"
+msgstr "Perfil"
+
+msgctxt "field:searching.profile.line,rec_name:"
+msgid "Name"
+msgstr "Nombre"
+
+msgctxt "field:searching.profile.line,sequence:"
+msgid "Sequence"
+msgstr "Secuencia"
+
+msgctxt "field:searching.profile.line,subfield:"
+msgid "Subfield"
+msgstr "Subcampo"
+
+msgctxt "field:searching.profile.line,value:"
+msgid "Value"
+msgstr "Valor"
+
+msgctxt "field:searching.profile.line,write_date:"
+msgid "Write Date"
+msgstr "Fecha modificación"
+
+msgctxt "field:searching.profile.line,write_uid:"
+msgid "Write User"
+msgstr "Usuario modificación"
+
+msgctxt "field:searching.start,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:searching.start,profile:"
+msgid "Profile"
+msgstr "Perfil"
+
+msgctxt "help:ir.model,searching_enabled:"
+msgid "Check if you want this model to be available in Searching Profiles."
+msgstr "Activar si desea que esté disponible en los perfiles de búsqueda."
+
+msgctxt "help:searching.profile,profile_groups:"
+msgid "User groups that will be able to see use this profile."
+msgstr "Grupo de usuarios que dispondrán de este filtro."
+
+msgctxt "model:ir.action,name:act_searching"
+msgid "Searching"
+msgstr "Búsqueda"
+
+msgctxt "model:ir.action,name:act_searching_profile_form"
+msgid "Searching profile"
+msgstr "Perfil búsqueda"
+
+msgctxt "model:ir.ui.menu,name:menu_act_searching"
+msgid "Searching"
+msgstr "Búsqueda"
+
+msgctxt "model:ir.ui.menu,name:menu_searching"
+msgid "Searching"
+msgstr "Búsqueda"
+
+msgctxt "model:ir.ui.menu,name:menu_searching_profile_form"
+msgid "Searching profile"
+msgstr "Perfil búsqueda"
+
+msgctxt "model:searching.profile,name:"
+msgid "Searching Profile"
+msgstr "Perfil búsqueda"
+
+msgctxt "model:searching.profile-res.group,name:"
+msgid "Searching Profile - Group"
+msgstr "Perfil búsqueda - Grupo"
+
+msgctxt "model:searching.profile.line,name:"
+msgid "Searching Profile Line"
+msgstr "Línea perfil búsqueda"
+
+msgctxt "model:searching.start,name:"
+msgid "Searching Start"
+msgstr "Inicio búsqueda"
+
+msgctxt "selection:searching.profile.line,condition:"
+msgid "AND"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,condition:"
+msgid "OR"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "!="
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "<"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "<="
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "="
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid ">"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid ">="
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "ilike"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "in"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "like"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "not ilike"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "not in"
+msgstr ""
+
+msgctxt "selection:searching.profile.line,operator:"
+msgid "not like"
+msgstr ""
+
+msgctxt "view:searching.profile.line:"
+msgid "Searching profile line"
+msgstr "Línea perfil búsqueda"
+
+msgctxt "view:searching.profile:"
+msgid "Filter"
+msgstr "Filtro"
+
+msgctxt "view:searching.profile:"
+msgid "Searching profile"
+msgstr "Perfil búsqueda"
+
+msgctxt "view:searching.start:"
+msgid "Searching"
+msgstr "Búsqueda"
+
+msgctxt "wizard_button:searching,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:searching,start,open_:"
+msgid "Search"
+msgstr "Buscar"
