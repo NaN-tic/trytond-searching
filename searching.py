@@ -68,10 +68,16 @@ class SearchingProfileLines(ModelSQL, ModelView):
     field = fields.Many2One('ir.model.field', 'Field',
         domain=[('model', '=', Eval('_parent_profile', {}).get('model'))],
         select=True, required=True)
+    field_type = fields.Function(fields.Char('Field Type'),
+        'on_change_with_field_type')
+    submodel = fields.Function(fields.Many2One('ir.model', 'Submodel'),
+        'on_change_with_submodel')
     subfield = fields.Many2One('ir.model.field', 'Subfield',
+        domain=[('model', '=',  Eval('submodel'))],
         states={
-            'required': Eval('_parent_field', {}).get('ttype') == 'one2many',
-        }, depends=['field'], select=True)
+            'invisible': Eval('field_type') != 'one2many',
+            'required': Eval('field_type') == 'one2many',
+        }, depends=['field_type', 'submodel'], select=True)
     operator = fields.Selection([
             ('=', '='),
             ('!=', '!='),
@@ -113,6 +119,20 @@ class SearchingProfileLines(ModelSQL, ModelView):
 
     def get_rec_name(self, name):
         return "'%s','%s','%s'" % (self.field, self.operator, self.value)
+
+    @fields.depends('field')
+    def on_change_with_field_type(self, name=None):
+        if self.field:
+            return self.field.ttype
+        return ''
+
+    @fields.depends('field')
+    def on_change_with_submodel(self, name=None):
+        Model = Pool().get('ir.model')
+        if self.field and self.field.ttype == 'one2many':
+            models = Model.search([('model', '=', self.field.relation)])
+            return models[0].id if models else None
+        return None
 
 
 class SearchingProfileGroup(ModelSQL):
