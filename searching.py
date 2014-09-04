@@ -1,30 +1,29 @@
-#This file is part searching module for Tryton.
-#The COPYRIGHT file at the top level of this repository contains 
-#the full copyright notices and license terms.
+# This file is part searching module for Tryton.
+# The COPYRIGHT file at the top level of this repository contains
+# the full copyright notices and license terms.
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Eval, PYSONEncoder, Id, Or
-import json
 
-__all__ = ['SearchingProfile', 'SearchingProfileLines', 'SearchingProfileGroup',
-    'SearchingStart', 'Searching', 'Model']
+__all__ = ['SearchingProfile', 'SearchingProfileLines',
+    'SearchingProfileGroup', 'SearchingStart', 'Searching', 'Model']
 __metaclass__ = PoolMeta
 
 _OPERATORS = [
-        ('=', '='),
-        ('!=', '!='),
-        ('like', 'like'),
-        ('not like', 'not like'),
-        ('ilike', 'ilike'),
-        ('not ilike', 'not ilike'),
-        ('in', 'in'),
-        ('not in', 'not in'),
-        ('<', '<'),
-        ('>', '>'),
-        ('<=', '<='),
-        ('>=', '>='),
-    ]
+    ('=', '='),
+    ('!=', '!='),
+    ('like', 'like'),
+    ('not like', 'not like'),
+    ('ilike', 'ilike'),
+    ('not ilike', 'not ilike'),
+    ('in', 'in'),
+    ('not in', 'not in'),
+    ('<', '<'),
+    ('>', '>'),
+    ('<=', '<='),
+    ('>=', '>='),
+]
 
 
 class SearchingProfile(ModelSQL, ModelView):
@@ -38,7 +37,7 @@ class SearchingProfile(ModelSQL, ModelView):
             },
         depends=['lines'])
     python_domain = fields.Boolean('Python Domain')
-    domain = fields.Text('Domain', 
+    domain = fields.Text('Domain',
         states={
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
@@ -54,7 +53,8 @@ class SearchingProfile(ModelSQL, ModelView):
     profile_groups = fields.Many2Many('searching.profile-res.group', 'profile',
         'group', 'Groups',
         states={
-            'invisible': ~Eval('groups', []).contains(Id('res', 'group_admin')),
+            'invisible': ~Eval('groups', []).contains(Id('res', 'group_admin')
+                ),
             },
         help='User groups that will be able to use this search profile.')
 
@@ -82,13 +82,13 @@ class SearchingProfile(ModelSQL, ModelView):
 class SearchingProfileLines(ModelSQL, ModelView):
     'Searching Profile Line'
     __name__ = 'searching.profile.line'
-    profile = fields.Many2One('searching.profile', 'Profile', ondelete='CASCADE',
-        select=True)
+    profile = fields.Many2One('searching.profile', 'Profile',
+        ondelete='CASCADE', select=True)
     sequence = fields.Integer('Sequence')
     condition = fields.Selection([
             ('AND', 'AND'),
             ('OR', 'OR'),
-        ], 'Condition', required=True)
+            ], 'Condition', required=True)
     field = fields.Many2One('ir.model.field', 'Field',
         domain=[('model', '=', Eval('_parent_profile', {}).get('model'))],
         select=True, required=True)
@@ -97,7 +97,7 @@ class SearchingProfileLines(ModelSQL, ModelView):
     submodel = fields.Function(fields.Many2One('ir.model', 'Submodel'),
         'on_change_with_submodel')
     subfield = fields.Many2One('ir.model.field', 'Subfield',
-        domain=[('model', '=',  Eval('submodel'))],
+        domain=[('model', '=', Eval('submodel'))],
         states={
             'invisible': Eval('field_type') != 'one2many',
             'required': Eval('field_type') == 'one2many',
@@ -162,7 +162,8 @@ class SearchingStart(ModelView):
     profile = fields.Many2One('searching.profile', 'Profile', required=True,
         domain=[
             ['OR',
-                ('profile_groups', 'in', Eval('context', {}).get('groups', [])),
+                ('profile_groups', 'in',
+                    Eval('context', {}).get('groups', [])),
                 ('profile_groups', '=', None),
             ],
             ],
@@ -172,7 +173,7 @@ class SearchingStart(ModelView):
         depends=['lines'])
     python_domain = fields.Function(fields.Boolean('Python Domain'),
         'on_change_with_python_domain')
-    domain = fields.Text('Domain', 
+    domain = fields.Text('Domain',
         states={
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('profile'), ~Eval('python_domain', False)),
@@ -272,5 +273,6 @@ class Searching(Wizard):
 
 class Model(ModelSQL, ModelView):
     __name__ = 'ir.model'
-    searching_enabled = fields.Boolean('Searching Enabled', help='Check if you want '
-        'this model to be available in Searching Profiles.')
+    searching_enabled = fields.Boolean('Searching Enabled',
+        help='Check if you want this model to be available in '
+        'Searching Profiles.')
