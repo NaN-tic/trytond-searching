@@ -257,6 +257,7 @@ class Searching(Wizard):
         domain = PYSONEncoder().encode(domain)
         context = {}
         return {
+            'id': -1,
             'name': '%s - %s' % (model.name, profile.name),
             'model': model_name,
             'res_model': model_name,
