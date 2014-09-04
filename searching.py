@@ -4,12 +4,27 @@
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
-from trytond.pyson import Eval, Id
+from trytond.pyson import Eval, PYSONEncoder, Id, Or
 import json
 
 __all__ = ['SearchingProfile', 'SearchingProfileLines', 'SearchingProfileGroup',
     'SearchingStart', 'Searching', 'Model']
 __metaclass__ = PoolMeta
+
+_OPERATORS = [
+        ('=', '='),
+        ('!=', '!='),
+        ('like', 'like'),
+        ('not like', 'not like'),
+        ('ilike', 'ilike'),
+        ('not ilike', 'not ilike'),
+        ('in', 'in'),
+        ('not in', 'not in'),
+        ('<', '<'),
+        ('>', '>'),
+        ('<=', '<='),
+        ('>=', '>='),
+    ]
 
 
 class SearchingProfile(ModelSQL, ModelView):
@@ -17,12 +32,23 @@ class SearchingProfile(ModelSQL, ModelView):
     __name__ = 'searching.profile'
     name = fields.Char('Name', required=True)
     model = fields.Many2One('ir.model', 'Model', required=True,
-        domain=[('searching_enabled', '=', True)])
+        domain=[('searching_enabled', '=', True)],
+        states={
+            'readonly': Eval('lines', False),
+            },
+        depends=['lines'])
+    python_domain = fields.Boolean('Python Domain')
+    domain = fields.Text('Domain', 
+        states={
+            'required': Eval('python_domain', False),
+            'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
+            },
+        depends=['model', 'python_domain'])
     lines = fields.One2Many('searching.profile.line', 'profile', 'Lines',
         states={
-            'invisible': Eval('python_domain', True),
+            'invisible': Or(~Eval('model'), Eval('python_domain', False)),
             },
-        depends=['python_domain'])
+        depends=['model', 'python_domain'])
     condition = fields.Function(fields.Char('Condition'),
         'get_condition')
     profile_groups = fields.Many2Many('searching.profile-res.group', 'profile',
@@ -30,14 +56,7 @@ class SearchingProfile(ModelSQL, ModelView):
         states={
             'invisible': ~Eval('groups', []).contains(Id('res', 'group_admin')),
             },
-        help='User groups that will be able to see use this profile.')
-    python_domain = fields.Boolean('Python Domain')
-    domain = fields.Text('Domain', 
-        states={
-            'required': Eval('python_domain', True),
-            'invisible': ~Eval('python_domain', False),
-            },
-        depends=['python_domain'])
+        help='User groups that will be able to use this search profile.')
 
     @staticmethod
     def default_python_domain():
@@ -65,6 +84,11 @@ class SearchingProfileLines(ModelSQL, ModelView):
     __name__ = 'searching.profile.line'
     profile = fields.Many2One('searching.profile', 'Profile', ondelete='CASCADE',
         select=True)
+    sequence = fields.Integer('Sequence')
+    condition = fields.Selection([
+            ('AND', 'AND'),
+            ('OR', 'OR'),
+        ], 'Condition', required=True)
     field = fields.Many2One('ir.model.field', 'Field',
         domain=[('model', '=', Eval('_parent_profile', {}).get('model'))],
         select=True, required=True)
@@ -78,26 +102,8 @@ class SearchingProfileLines(ModelSQL, ModelView):
             'invisible': Eval('field_type') != 'one2many',
             'required': Eval('field_type') == 'one2many',
         }, depends=['field_type', 'submodel'], select=True)
-    operator = fields.Selection([
-            ('=', '='),
-            ('!=', '!='),
-            ('like', 'like'),
-            ('not like', 'not like'),
-            ('ilike', 'ilike'),
-            ('not ilike', 'not ilike'),
-            ('in', 'in'),
-            ('not in', 'not in'),
-            ('<', '<'),
-            ('>', '>'),
-            ('<=', '<='),
-            ('>=', '>='),
-        ], 'Operator', required=True)
-    condition = fields.Selection([
-            ('AND', 'AND'),
-            ('OR', 'OR'),
-        ], 'Condition', required=True)
-    value = fields.Char('Value', required=True)
-    sequence = fields.Integer('Sequence')
+    operator = fields.Selection(_OPERATORS, 'Operator', required=True)
+    value = fields.Char('Value')
 
     @classmethod
     def __setup__(cls):
@@ -159,7 +165,43 @@ class SearchingStart(ModelView):
                 ('profile_groups', 'in', Eval('context', {}).get('groups', [])),
                 ('profile_groups', '=', None),
             ],
-        ],)
+            ],
+        states={
+            'readonly': Eval('lines', False),
+            },
+        depends=['lines'])
+    python_domain = fields.Function(fields.Boolean('Python Domain'),
+        'on_change_with_python_domain')
+    domain = fields.Text('Domain', 
+        states={
+            'required': Eval('python_domain', False),
+            'invisible': Or(~Eval('profile'), ~Eval('python_domain', False)),
+            },
+        depends=['profile', 'python_domain'])
+    lines = fields.One2Many('searching.profile.line', None, 'Lines',
+        states={
+            'invisible': Or(~Eval('profile'), Eval('python_domain', False)),
+            },
+        depends=['profile', 'python_domain'])
+
+    @fields.depends('profile')
+    def on_change_with_python_domain(self, name=None):
+        if self.profile:
+            return self.profile.python_domain
+        return False
+
+    @fields.depends('profile')
+    def on_change_with_domain(self, name=None):
+        if self.profile:
+            return self.profile.domain
+        return None
+
+    @fields.depends('profile')
+    def on_change_with_lines(self, name=None):
+        lines = []
+        if self.profile:
+            lines = [x.id for x in self.profile.lines]
+        return lines
 
 
 class Searching(Wizard):
@@ -188,7 +230,7 @@ class Searching(Wizard):
         if not profile.python_domain:
             condition_and = []
             condition_or = []
-            for line in profile.lines:
+            for line in self.start.lines:
                 field = line.field.name
                 if line.subfield:
                     field = '%s.%s' % (line.field.name, line.subfield.name)
@@ -204,7 +246,7 @@ class Searching(Wizard):
             if condition_and:
                 condition.append(condition_and)
         else:
-            condition = eval(profile.domain)
+            condition = eval(self.start.domain)
 
         try:
             records = Model.search(condition)
@@ -212,10 +254,10 @@ class Searching(Wizard):
             self.raise_user_error('error_domain', condition)
 
         domain = [('id', 'in', [x.id for x in records])]
-        domain = json.dumps(domain)
+        domain = PYSONEncoder().encode(domain)
         context = {}
         return {
-            'name': '%s - %s' % (profile.name, model.name),
+            'name': '%s - %s' % (model.name, profile.name),
             'model': model_name,
             'res_model': model_name,
             'type': 'ir.action.act_window',
