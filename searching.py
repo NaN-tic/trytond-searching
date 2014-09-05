@@ -63,19 +63,18 @@ class SearchingProfile(ModelSQL, ModelView):
         return False
 
     def get_rec_name(self, name):
-        condition = []
-        for line in self.lines:
-            condition.append("('%s', '%s', '%s')" % (
-                line.field.name, line.operator, line.value
-                ))
-        return '%s - %s' % (self.name, ', '.join(condition))
+        return '%s - %s' % (self.name, self.get_condition(name))
 
     def get_condition(self, name):
         condition = []
         for line in self.lines:
-            condition.append("('%s', '%s', '%s')" % (
-                line.field.name, line.operator, line.value
-                ))
+            if line.subfield:
+                condition.append("('%s.%s','%s','%s')" % (line.field.name,
+                    line.subfield.name, line.operator, line.value))
+            else:
+                condition.append("('%s', '%s', '%s')" % (line.field.name,
+                    line.operator, line.value))
+
         return ', '.join(condition)
 
 
@@ -124,7 +123,12 @@ class SearchingProfileLines(ModelSQL, ModelView):
         return 'AND'
 
     def get_rec_name(self, name):
-        return "'%s','%s','%s'" % (self.field, self.operator, self.value)
+        if self.subfield:
+            return "'%s.%s','%s','%s'" % (self.field.name, self.subfield.name,
+                self.operator, self.value)
+        else:
+            return "'%s','%s','%s'" % (self.field.name,
+                self.operator, self.value)
 
     @fields.depends('field')
     def on_change_with_field_type(self, name=None):
