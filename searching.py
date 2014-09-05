@@ -246,8 +246,8 @@ class Searching(Wizard):
 
             condition = []
             if condition_or:
-                condition.append('OR')
-                condition.append([condition_or])
+                condition_or.insert(0, 'OR')
+                condition.append(condition_or)
             if condition_and:
                 condition.append(condition_and)
         else:
