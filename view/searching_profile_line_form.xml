@@ -4,8 +4,8 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
 <form string="Searching profile line">
     <label name="profile"/>
     <field name="profile"/>
-    <label name="condition"/>
-    <field name="condition"/>
+    <label name="sequence"/>
+    <field name="sequence"/>
     <label name="field"/>
     <field name="field"/>
     <label name="subfield"/>
@@ -14,6 +14,6 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
     <field name="operator"/>
     <label name="value"/>
     <field name="value"/>
-    <label name="sequence"/>
-    <field name="sequence"/>
+    <label name="condition"/>
+    <field name="condition"/>
 </form>
