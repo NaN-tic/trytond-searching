@@ -4,6 +4,7 @@
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
+from trytond.transaction import Transaction
 from trytond.pyson import Eval, PYSONEncoder, Id, Or
 
 __all__ = ['SearchingProfile', 'SearchingProfileLines',
@@ -262,7 +263,8 @@ class Searching(Wizard):
         try:
             records = Model.search(condition)
         except:
-            self.raise_user_error('error_domain', condition)
+            with Transaction().new_cursor():
+                self.raise_user_error('error_domain', str(condition))
 
         domain = [('id', 'in', [x.id for x in records])]
         domain = PYSONEncoder().encode(domain)
