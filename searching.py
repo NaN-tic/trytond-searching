@@ -90,7 +90,8 @@ class SearchingProfileLines(ModelSQL, ModelView):
             ('OR', 'OR'),
             ], 'Condition', required=True)
     field = fields.Many2One('ir.model.field', 'Field',
-        domain=[('model', '=', Eval('_parent_profile', {}).get('model'))],
+        domain=[('model', '=',
+            Eval('_parent_profile', Eval('context', {})).get('model', -1))],
         select=True, required=True)
     field_type = fields.Function(fields.Char('Field Type'),
         'on_change_with_field_type')
@@ -134,6 +135,10 @@ class SearchingProfileLines(ModelSQL, ModelView):
                 self.operator, self.value)
 
     @fields.depends('field')
+    def on_change_field(self):
+        return {'subfield': None}
+
+    @fields.depends('field')
     def on_change_with_field_type(self, name=None):
         if self.field:
             return self.field.ttype
@@ -142,7 +147,13 @@ class SearchingProfileLines(ModelSQL, ModelView):
     @fields.depends('field', '_parent_profile.model')
     def on_change_with_submodel(self, name=None):
         Model = Pool().get('ir.model')
-        ProfileModel = Pool().get(self.profile.model.model)
+        if hasattr(self, 'profile'):
+            profile_model = self.profile.model
+        elif 'model' in Transaction().context:
+            profile_model = Model(Transaction().context.get('model'))
+        else:
+            return None
+        ProfileModel = Pool().get(profile_model.model)
         if (self.field and
                 self.field.ttype in ['many2one', 'one2many', 'many2many']):
             field = ProfileModel._fields[self.field.name]
@@ -182,6 +193,8 @@ class SearchingStart(ModelView):
             'readonly': Eval('lines', False),
             },
         depends=['lines'])
+    model = fields.Function(fields.Many2One('ir.model', 'Model'),
+        'on_change_with_model')
     python_domain = fields.Function(fields.Boolean('Python Domain'),
         'on_change_with_python_domain')
     domain = fields.Text('Domain',
@@ -194,7 +207,16 @@ class SearchingStart(ModelView):
         states={
             'invisible': Or(~Eval('profile'), Eval('python_domain', False)),
             },
-        depends=['profile', 'python_domain'])
+        context={
+            'model': Eval('model'),
+            },
+        depends=['profile', 'python_domain', 'model'],)
+
+    @fields.depends('profile')
+    def on_change_with_model(self, name=None):
+        if self.profile:
+            return self.profile.model.id
+        return None
 
     @fields.depends('profile')
     def on_change_with_python_domain(self, name=None):
