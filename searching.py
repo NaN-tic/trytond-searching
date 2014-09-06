@@ -136,7 +136,7 @@ class SearchingProfileLines(ModelSQL, ModelView):
             return self.field.ttype
         return ''
 
-    @fields.depends('field')
+    @fields.depends('field', '_parent_profile.model')
     def on_change_with_submodel(self, name=None):
         Model = Pool().get('ir.model')
         ProfileModel = Pool().get(self.profile.model.model)
