@@ -251,22 +251,21 @@ class Searching(Wizard):
                 else:
                     condition_or.append((field, line.operator, line.value))
 
-            condition = []
+            domain = []
             if condition_or:
                 condition_or.insert(0, 'OR')
-                condition.append(condition_or)
+                domain.append(condition_or)
             if condition_and:
-                condition.append(condition_and)
+                domain.append(condition_and)
         else:
-            condition = eval(self.start.domain)
+            domain = eval(self.start.domain)
 
         try:
-            records = Model.search(condition)
+            records = Model.search(domain)
         except:
             with Transaction().new_cursor():
-                self.raise_user_error('error_domain', str(condition))
+                self.raise_user_error('error_domain', str(domain))
 
-        domain = [('id', 'in', [x.id for x in records])]
         domain = PYSONEncoder().encode(domain)
         context = {}
         return {
