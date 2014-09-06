@@ -98,8 +98,10 @@ class SearchingProfileLines(ModelSQL, ModelView):
     subfield = fields.Many2One('ir.model.field', 'Subfield',
         domain=[('model', '=', Eval('submodel'))],
         states={
-            'invisible': ~Eval('field_type').in_(['one2many', 'many2many']),
-            'required': Eval('field_type').in_(['one2many', 'many2many']),
+            'invisible': ~Eval('field_type').in_(
+                ['many2one', 'one2many', 'many2many']),
+            'required': Eval('field_type').in_(
+                ['many2one', 'one2many', 'many2many']),
         }, depends=['field_type', 'submodel'], select=True)
     operator = fields.Selection(_OPERATORS, 'Operator', required=True)
     value = fields.Char('Value')
@@ -140,7 +142,8 @@ class SearchingProfileLines(ModelSQL, ModelView):
     def on_change_with_submodel(self, name=None):
         Model = Pool().get('ir.model')
         ProfileModel = Pool().get(self.profile.model.model)
-        if self.field and self.field.ttype in ['one2many', 'many2many']:
+        if (self.field and
+                self.field.ttype in ['many2one', 'one2many', 'many2many']):
             field = ProfileModel._fields[self.field.name]
             relation = field.get_target().__name__
             models = Model.search([('model', '=', relation)])
