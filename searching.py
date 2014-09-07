@@ -7,7 +7,7 @@ from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, PYSONEncoder, Id, Or
 
-__all__ = ['SearchingProfile', 'SearchingProfileLines',
+__all__ = ['SearchingProfile', 'SearchingProfileLine',
     'SearchingProfileGroup', 'SearchingStart', 'Searching', 'Model']
 __metaclass__ = PoolMeta
 
@@ -79,7 +79,7 @@ class SearchingProfile(ModelSQL, ModelView):
         return ', '.join(condition)
 
 
-class SearchingProfileLines(ModelSQL, ModelView):
+class SearchingProfileLine(ModelSQL, ModelView):
     'Searching Profile Line'
     __name__ = 'searching.profile.line'
     profile = fields.Many2One('searching.profile', 'Profile',
@@ -110,7 +110,7 @@ class SearchingProfileLines(ModelSQL, ModelView):
 
     @classmethod
     def __setup__(cls):
-        super(SearchingProfileLines, cls).__setup__()
+        super(SearchingProfileLine, cls).__setup__()
         cls._order.insert(0, ('sequence', 'ASC'))
 
     @staticmethod

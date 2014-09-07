@@ -8,7 +8,7 @@ from .searching import *
 def register():
     Pool.register(
         SearchingProfile,
-        SearchingProfileLines,
+        SearchingProfileLine,
         SearchingProfileGroup,
         SearchingStart,
         Model,
