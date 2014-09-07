@@ -4,7 +4,7 @@ msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:searching:"
 msgid "Error domain \"%s\""
-msgstr "Error domini \"%s\""
+msgstr "Error de domini \"%s\""
 
 msgctxt "field:ir.model,searching_enabled:"
 msgid "Searching Enabled"
@@ -32,7 +32,7 @@ msgstr "ID"
 
 msgctxt "field:searching.profile,lines:"
 msgid "Lines"
-msgstr "Linias"
+msgstr "Línies"
 
 msgctxt "field:searching.profile,model:"
 msgid "Model"
@@ -110,6 +110,10 @@ msgctxt "field:searching.profile.line,field:"
 msgid "Field"
 msgstr "Camp"
 
+msgctxt "field:searching.profile.line,field_type:"
+msgid "Field Type"
+msgstr "Tipus de camp"
+
 msgctxt "field:searching.profile.line,id:"
 msgid "ID"
 msgstr "ID"
@@ -128,11 +132,15 @@ msgstr "Nom"
 
 msgctxt "field:searching.profile.line,sequence:"
 msgid "Sequence"
-msgstr "Secuencia"
+msgstr "Seqüència"
 
 msgctxt "field:searching.profile.line,subfield:"
 msgid "Subfield"
 msgstr "Subcamp"
+
+msgctxt "field:searching.profile.line,submodel:"
+msgid "Submodel"
+msgstr "Submodel"
 
 msgctxt "field:searching.profile.line,value:"
 msgid "Value"
@@ -146,29 +154,47 @@ msgctxt "field:searching.profile.line,write_uid:"
 msgid "Write User"
 msgstr "Usuari modificació"
 
+msgctxt "field:searching.start,domain:"
+msgid "Domain"
+msgstr "Domini"
+
 msgctxt "field:searching.start,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:searching.start,lines:"
+msgid "Lines"
+msgstr "Línies"
+
+msgctxt "field:searching.start,model:"
+msgid "Model"
+msgstr "Model"
 
 msgctxt "field:searching.start,profile:"
 msgid "Profile"
 msgstr "Perfil"
 
+msgctxt "field:searching.start,python_domain:"
+msgid "Python Domain"
+msgstr "Domini Python"
+
 msgctxt "help:ir.model,searching_enabled:"
 msgid "Check if you want this model to be available in Searching Profiles."
-msgstr "Activa si vol que estigui disponible en els perfils de cerca."
+msgstr ""
+"Marqueu si voleu que aquest model estigui disponible en els perfils de "
+"cerca."
 
 msgctxt "help:searching.profile,profile_groups:"
-msgid "User groups that will be able to see use this profile."
-msgstr "Grup d'usuaris que disposen d'aquest filtre."
+msgid "User groups that will be able to use this search profile."
+msgstr "Grups d'usuaris que disposaran d'aquest perfil de cerca."
 
 msgctxt "model:ir.action,name:act_searching"
 msgid "Searching"
 msgstr "Cerca"
 
 msgctxt "model:ir.action,name:act_searching_profile_form"
-msgid "Searching profile"
-msgstr "Perfil cerca"
+msgid "Profile"
+msgstr "Perfil de cerca"
 
 msgctxt "model:ir.ui.menu,name:menu_act_searching"
 msgid "Searching"
@@ -179,20 +205,20 @@ msgid "Searching"
 msgstr "Cerca"
 
 msgctxt "model:ir.ui.menu,name:menu_searching_profile_form"
-msgid "Searching profile"
-msgstr "Perfil cerca"
+msgid "Profile"
+msgstr "Perfils de cerca"
 
 msgctxt "model:searching.profile,name:"
 msgid "Searching Profile"
-msgstr "Perfil cerca"
+msgstr "Perfil de cerca"
 
 msgctxt "model:searching.profile-res.group,name:"
 msgid "Searching Profile - Group"
-msgstr "Perfil cerca - Grupo"
+msgstr "Perfil de cerca - Grup"
 
 msgctxt "model:searching.profile.line,name:"
 msgid "Searching Profile Line"
-msgstr "Linia perfil cerca"
+msgstr "Línia perfil de cerca"
 
 msgctxt "model:searching.start,name:"
 msgid "Searching Start"
@@ -256,7 +282,7 @@ msgstr ""
 
 msgctxt "view:searching.profile.line:"
 msgid "Searching profile line"
-msgstr "Linia perfil cerca"
+msgstr "Línia perfil de cerca"
 
 msgctxt "view:searching.profile:"
 msgid "Filter"
@@ -264,7 +290,7 @@ msgstr "Filtre"
 
 msgctxt "view:searching.profile:"
 msgid "Searching profile"
-msgstr "Perfil cerca"
+msgstr "Perfil de cerca"
 
 msgctxt "view:searching.start:"
 msgid "Searching"
