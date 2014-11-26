@@ -56,7 +56,7 @@ msgstr "Nom"
 
 msgctxt "field:searching.profile,write_date:"
 msgid "Write Date"
-msgstr "Data modificación"
+msgstr "Data modificació"
 
 msgctxt "field:searching.profile,write_uid:"
 msgid "Write User"
@@ -88,7 +88,7 @@ msgstr "Nom"
 
 msgctxt "field:searching.profile-res.group,write_date:"
 msgid "Write Date"
-msgstr "Data modificación"
+msgstr "Data modificació"
 
 msgctxt "field:searching.profile-res.group,write_uid:"
 msgid "Write User"
