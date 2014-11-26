@@ -258,8 +258,8 @@ class Searching(Wizard):
     def do_open_(self, action):
         profile = self.start.profile
         model = profile.model
-        model_name = profile.model.model
-        Model = Pool().get(model_name)
+        model_model = profile.model.model
+        Model = Pool().get(model_model)
 
         if not profile.python_domain:
             condition_and = []
@@ -283,7 +283,7 @@ class Searching(Wizard):
             domain = eval(self.start.domain)
 
         try:
-            records = Model.search(domain)
+            Model.search(domain)
         except:
             with Transaction().new_cursor():
                 self.raise_user_error('error_domain', str(domain))
@@ -293,8 +293,8 @@ class Searching(Wizard):
         return {
             'id': -1,
             'name': '%s - %s' % (model.name, profile.name),
-            'model': model_name,
-            'res_model': model_name,
+            'model': model_model,
+            'res_model': model_model,
             'type': 'ir.action.act_window',
             'pyson_domain': domain,
             'pyson_context': context,
