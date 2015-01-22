@@ -78,6 +78,29 @@ class SearchingProfile(ModelSQL, ModelView):
 
         return ', '.join(condition)
 
+    def get_domain(self):
+        if not self.python_domain:
+            condition_and = []
+            condition_or = []
+            for line in self.lines:
+                field = line.field.name
+                if line.subfield:
+                    field = '%s.%s' % (line.field.name, line.subfield.name)
+                if line.condition == 'AND':
+                    condition_and.append((field, line.operator, line.value))
+                else:
+                    condition_or.append((field, line.operator, line.value))
+
+            domain = []
+            if condition_or:
+                condition_or.insert(0, 'OR')
+                domain.append(condition_or)
+            if condition_and:
+                domain.append(condition_and)
+        else:
+            domain = eval(self.domain)
+        return domain
+
 
 class SearchingProfileLine(ModelSQL, ModelView):
     'Searching Profile Line'
@@ -260,27 +283,7 @@ class Searching(Wizard):
         model = profile.model
         model_model = profile.model.model
         Model = Pool().get(model_model)
-
-        if not profile.python_domain:
-            condition_and = []
-            condition_or = []
-            for line in self.start.lines:
-                field = line.field.name
-                if line.subfield:
-                    field = '%s.%s' % (line.field.name, line.subfield.name)
-                if line.condition == 'AND':
-                    condition_and.append((field, line.operator, line.value))
-                else:
-                    condition_or.append((field, line.operator, line.value))
-
-            domain = []
-            if condition_or:
-                condition_or.insert(0, 'OR')
-                domain.append(condition_or)
-            if condition_and:
-                domain.append(condition_and)
-        else:
-            domain = eval(self.start.domain)
+        domain = profile.get_domain()
 
         try:
             Model.search(domain)
