@@ -1,6 +1,8 @@
 # This file is part searching module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+from datetime import datetime
+from decimal import Decimal
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
@@ -87,9 +89,13 @@ class SearchingProfile(ModelSQL, ModelView):
                 if line.subfield:
                     field = '%s.%s' % (line.field.name, line.subfield.name)
                 if line.condition == 'AND':
-                    condition_and.append((field, line.operator, line.value))
+                    condition_and.append(
+                        (field, line.operator, line.get_value()),
+                        )
                 else:
-                    condition_or.append((field, line.operator, line.value))
+                    condition_or.append(
+                        (field, line.operator, line.get_value()),
+                        )
 
             domain = []
             if condition_or:
@@ -135,6 +141,27 @@ class SearchingProfileLine(ModelSQL, ModelView):
     def __setup__(cls):
         super(SearchingProfileLine, cls).__setup__()
         cls._order.insert(0, ('sequence', 'ASC'))
+        cls._error_messages.update({
+                'not_implemented_error':
+                    'Error. Field of type %s is not implemented yet.',
+                'datetime_format_error':
+                    'Error building domain of type DateTime or Timestamp. '
+                    'Please, check the format:\n\n'
+                    'Field: \'%s\'\n'
+                    'Value: \'%s\'\n'
+                    'Format: \'%%d/%%m/%%Y %%H:%%M:%%S\'',
+                'date_format_error':
+                    'Error building domain of type Date. '
+                    'Please, check the format:\n\n'
+                    'Field: \'%s\'\n'
+                    'Value: \'%s\'\n'
+                    'Format: \'%%d/%%m/%%Y\'',
+                'number_format_error':
+                    'Error building domain of type Float. '
+                    'Please, ensure you have put a number.\n\n'
+                    'Field: \'%s\'\n'
+                    'Value: \'%s\'\n',
+                })
 
     @staticmethod
     def order_sequence(tables):
@@ -148,6 +175,57 @@ class SearchingProfileLine(ModelSQL, ModelView):
     @staticmethod
     def default_condition():
         return 'AND'
+
+    def get_value_boolean(self):
+        return bool(self.value)
+
+    def get_value_integer(self):
+        try:
+            return int(self.value)
+        except ValueError:
+            self.raise_user_error('number_format_error',
+                error_args=(self.field.name, self.value))
+
+    def get_value_float(self):
+        try:
+            return float(self.value)
+        except ValueError:
+            self.raise_user_error('number_format_error',
+                error_args=(self.field.name, self.value))
+
+    def get_value_numeric(self):
+        try:
+            return Decimal(self.value)
+        except ValueError:
+            self.raise_user_error('number_format_error',
+                error_args=(self.field.name, self.value))
+
+    def get_value_date(self):
+        try:
+            return datetime.strptime(self.value, '%d/%m/%Y').date()
+        except ValueError:
+            self.raise_user_error('date_format_error',
+                error_args=(self.field.name, self.value))
+
+    def get_value_datetime(self):
+        try:
+            return datetime.strptime(self.value, '%d/%m/%Y %H:%M:%S')
+        except ValueError:
+            self.raise_user_error('datetime_format_error',
+                error_args=(self.field.name, self.value))
+
+    def get_value_timestamp(self):
+        return self.get_value_datetime()
+
+    def get_value(self):
+        if self.field_type in ('boolean', 'integer', 'float', 'numeric',
+                'date', 'datetime', 'timestamp'):
+            return getattr(self, 'get_value_%s' % self.field_type)()
+        elif self.field_type in ('char', 'text', 'selection', 'reference',
+                'many2one'):
+            return self.value
+        self.raise_user_error('not_implemented_error',
+            error_args=(self.field_type,))
 
     def get_rec_name(self, name):
         if self.subfield:
