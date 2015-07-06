@@ -376,14 +376,14 @@ class Searching(Wizard):
         Model = Pool().get(model_model)
         domain = get_domain(self.start)
 
+        if profile.action and profile.action.domain:
+            domain = domain + eval(profile.action.domain)
+
         try:
             Model.search(domain)
         except:
             with Transaction().new_cursor():
                 self.raise_user_error('error_domain', str(domain))
-
-        domain = PYSONEncoder().encode(domain)
-        context = {}
 
         # return custom action window
         if profile.action:
@@ -391,8 +391,8 @@ class Searching(Wizard):
             action = Action.get_action_values(action.type, [action.id])[0]
             action['res_model'] = model_model
             action['name'] = '%s - %s' % (model.name, profile.name)
-            action['pyson_domain'] = domain
-            action['pyson_context'] = context
+            action['pyson_domain'] = PYSONEncoder().encode(domain)
+            action['pyson_context'] = profile.action.context or {}
             return action, {}
 
         # return default action window
@@ -402,8 +402,8 @@ class Searching(Wizard):
             'model': model_model,
             'res_model': model_model,
             'type': 'ir.action.act_window',
-            'pyson_domain': domain,
-            'pyson_context': context,
+            'pyson_domain': PYSONEncoder().encode(domain),
+            'pyson_context': {},
             'pyson_order': '[]',
             'pyson_search_value': '[]',
             'domains': [],
