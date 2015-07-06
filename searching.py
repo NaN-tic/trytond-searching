@@ -80,33 +80,6 @@ class SearchingProfile(ModelSQL, ModelView):
 
         return ', '.join(condition)
 
-    def get_domain(self):
-        if not self.python_domain:
-            condition_and = []
-            condition_or = []
-            for line in self.lines:
-                field = line.field.name
-                if line.subfield:
-                    field = '%s.%s' % (line.field.name, line.subfield.name)
-                if line.condition == 'AND':
-                    condition_and.append(
-                        (field, line.operator, line.get_value()),
-                        )
-                else:
-                    condition_or.append(
-                        (field, line.operator, line.get_value()),
-                        )
-
-            domain = []
-            if condition_or:
-                condition_or.insert(0, 'OR')
-                domain.append(condition_or)
-            if condition_and:
-                domain.append(condition_and)
-        else:
-            domain = eval(self.domain)
-        return domain
-
 
 class SearchingProfileLine(ModelSQL, ModelView):
     'Searching Profile Line'
@@ -248,7 +221,7 @@ class SearchingProfileLine(ModelSQL, ModelView):
     @fields.depends('field', '_parent_profile.model')
     def on_change_with_submodel(self, name=None):
         Model = Pool().get('ir.model')
-        if hasattr(self, 'profile'):
+        if getattr(self, 'profile'):
             profile_model = self.profile.model
         elif 'model' in Transaction().context:
             profile_model = Model(Transaction().context.get('model'))
@@ -357,11 +330,38 @@ class Searching(Wizard):
                 })
 
     def do_open_(self, action):
+        def get_domain(self):
+            if not self.python_domain:
+                condition_and = []
+                condition_or = []
+                for line in self.lines:
+                    field = line.field.name
+                    if line.subfield:
+                        field = '%s.%s' % (line.field.name, line.subfield.name)
+                    if line.condition == 'AND':
+                        condition_and.append(
+                            (field, line.operator, line.get_value()),
+                            )
+                    else:
+                        condition_or.append(
+                            (field, line.operator, line.get_value()),
+                            )
+
+                domain = []
+                if condition_or:
+                    condition_or.insert(0, 'OR')
+                    domain.append(condition_or)
+                if condition_and:
+                    domain.append(condition_and)
+            else:
+                domain = eval(self.domain)
+            return domain
+
         profile = self.start.profile
         model = profile.model
         model_model = profile.model.model
         Model = Pool().get(model_model)
-        domain = profile.get_domain()
+        domain = get_domain(self.start)
 
         try:
             Model.search(domain)
