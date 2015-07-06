@@ -3,28 +3,20 @@
 The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
 <tryton>
     <data>
+        <!-- Groups -->
+        <record model="res.group" id="group_searching_admin">
+            <field name="name">Searching Administration</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_searching_admin">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_searching_admin"/>
+        </record>
+
         <record model="ir.ui.icon" id="searching_icon">
             <field name="name">tryton-searching</field>
             <field name="path">icons/tryton-searching.svg</field>
         </record>
         <menuitem id="menu_searching" name="Searching" icon="tryton-searching"/>
-
-        <!-- access -->
-        <record model="ir.model.access" id="access_searching_profile">
-            <field name="model" search="[('model', '=', 'searching.profile')]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_delete" eval="True"/>
-        </record>
-
-        <record model="ir.model.access" id="access_searching_profile_line">
-            <field name="model" search="[('model', '=', 'searching.profile.line')]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_delete" eval="True"/>
-        </record>
 
         <!-- searching.profile -->
         <record model="ir.ui.view" id="searching_profile_view_tree">
@@ -53,6 +45,10 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
         </record>
         <menuitem parent="menu_searching" sequence="1"
             action="act_searching_profile_form" id="menu_searching_profile_form"/>
+        <record model="ir.ui.menu-res.group" id="menu_searching_group_searching_admin">
+            <field name="menu" ref="menu_searching_profile_form"/>
+            <field name="group" ref="group_searching_admin"/>
+        </record>
 
         <!-- searching.profile.line -->
         <record model="ir.ui.view" id="searching_profile_line_tree_view">
@@ -85,6 +81,31 @@ The COPYRIGHT file at the top level of this repository contains the full copyrig
             <field name="model">ir.model</field>
             <field name="inherit" ref="ir.model_view_form"/>
             <field name="name">model_form</field>
+        </record>
+
+        <!-- access -->
+        <record model="ir.model.access" id="access_searching_profile">
+            <field name="model" search="[('model', '=', 'searching.profile')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_searching_profile_admin">
+            <field name="model" search="[('model', '=', 'searching.profile')]"/>
+            <field name="group" ref="group_searching_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.model.access" id="access_searching_profile_line">
+            <field name="model" search="[('model', '=', 'searching.profile.line')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
         </record>
     </data>
 </tryton>
