@@ -4,6 +4,7 @@
 from datetime import datetime
 from decimal import Decimal
 from trytond.model import ModelView, ModelSQL, fields
+from trytond.model.fields import depends
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
@@ -39,6 +40,8 @@ class SearchingProfile(ModelSQL, ModelView):
             'readonly': Eval('lines', False),
             },
         depends=['lines'])
+    model_name = fields.Function(fields.Char('Model Name'),
+        'on_change_with_model_name')
     python_domain = fields.Boolean('Python Domain')
     domain = fields.Text('Domain',
         states={
@@ -60,6 +63,10 @@ class SearchingProfile(ModelSQL, ModelView):
                 ),
             },
         help='User groups that will be able to use this search profile.')
+    action = fields.Many2One('ir.action.act_window', 'Action',
+        domain=[('res_model', '=', Eval('model_name'))],
+        depends=['model_name'],
+        help='Action Window to display the results')
 
     @staticmethod
     def default_python_domain():
@@ -67,6 +74,10 @@ class SearchingProfile(ModelSQL, ModelView):
 
     def get_rec_name(self, name):
         return '%s - %s' % (self.name, self.get_condition(name))
+
+    @depends('model')
+    def on_change_with_model_name(self, name=None):
+        return self.model.model if self.model else None
 
     def get_condition(self, name):
         condition = []
@@ -330,6 +341,8 @@ class Searching(Wizard):
                 })
 
     def do_open_(self, action):
+        Action = Pool().get('ir.action')
+
         def get_domain(self):
             if not self.python_domain:
                 condition_and = []
@@ -371,6 +384,18 @@ class Searching(Wizard):
 
         domain = PYSONEncoder().encode(domain)
         context = {}
+
+        # return custom action window
+        if profile.action:
+            action = profile.action
+            action = Action.get_action_values(action.type, [action.id])[0]
+            action['res_model'] = model_model
+            action['name'] = '%s - %s' % (model.name, profile.name)
+            action['pyson_domain'] = domain
+            action['pyson_context'] = context
+            return action, {}
+
+        # return default action window
         return {
             'id': -1,
             'name': '%s - %s' % (model.name, profile.name),
