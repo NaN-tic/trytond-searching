@@ -54,6 +54,10 @@ msgctxt "field:ir.model,searching_enabled:"
 msgid "Searching Enabled"
 msgstr "Activa cerca"
 
+msgctxt "field:searching.profile,action:"
+msgid "Action"
+msgstr "Acció"
+
 msgctxt "field:searching.profile,condition:"
 msgid "Condition"
 msgstr "Condició"
@@ -81,6 +85,10 @@ msgstr "Línies"
 msgctxt "field:searching.profile,model:"
 msgid "Model"
 msgstr "Model"
+
+msgctxt "field:searching.profile,model_name:"
+msgid "Model Name"
+msgstr "Nom del model"
 
 msgctxt "field:searching.profile,name:"
 msgid "Name"
@@ -228,6 +236,10 @@ msgstr ""
 "Marqueu si voleu que aquest model estigui disponible en els perfils de "
 "cerca."
 
+msgctxt "help:searching.profile,action:"
+msgid "Action Window to display the results"
+msgstr "Acció finestra per mostrar els resultats"
+
 msgctxt "help:searching.profile,profile_groups:"
 msgid "User groups that will be able to use this search profile."
 msgstr "Grups d'usuaris que disposaran d'aquest perfil de cerca."
@@ -251,6 +263,10 @@ msgstr "Cerca"
 msgctxt "model:ir.ui.menu,name:menu_searching_profile_form"
 msgid "Profile"
 msgstr "Perfils de cerca"
+
+msgctxt "model:res.group,name:group_searching_admin"
+msgid "Searching Administration"
+msgstr "Administració Cerca Avançada"
 
 msgctxt "model:searching.profile,name:"
 msgid "Searching Profile"
