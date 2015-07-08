@@ -48,7 +48,9 @@ class SearchingProfile(ModelSQL, ModelView):
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
             },
-        depends=['model', 'python_domain'])
+        depends=['model', 'python_domain'],
+        help='Python code that returns a variable called domain with a tryton '
+            'domain.')
     lines = fields.One2Many('searching.profile.line', 'profile', 'Lines',
         states={
             'invisible': Or(~Eval('model'), Eval('python_domain', False)),
@@ -67,6 +69,13 @@ class SearchingProfile(ModelSQL, ModelView):
         domain=[('res_model', '=', Eval('model_name'))],
         depends=['model_name'],
         help='Action Window to display the results')
+
+    @classmethod
+    def __setup__(cls):
+        super(SearchingProfile, cls).__setup__()
+        cls._error_messages.update({
+                'domain_field_error': ('Error in field domain: %s'),
+                })
 
     @staticmethod
     def default_python_domain():
@@ -90,6 +99,37 @@ class SearchingProfile(ModelSQL, ModelView):
                     line.operator, line.value))
 
         return ', '.join(condition)
+
+    def get_domain(self):
+        if not self.python_domain:
+            condition_and = []
+            condition_or = []
+            for line in self.lines:
+                field = line.field.name
+                if line.subfield:
+                    field = '%s.%s' % (line.field.name, line.subfield.name)
+                if line.condition == 'AND':
+                    condition_and.append(
+                        (field, line.operator, line.get_value()),
+                        )
+                else:
+                    condition_or.append(
+                        (field, line.operator, line.get_value()),
+                        )
+
+            domain = []
+            if condition_or:
+                condition_or.insert(0, 'OR')
+                domain.append(condition_or)
+            if condition_and:
+                domain.append(condition_and)
+        else:
+            try:
+                exec self.domain
+            except TypeError, e:
+                self.raise_user_error('domain_field_error',
+                    error_args=(e.message,))
+        return domain
 
 
 class SearchingProfileLine(ModelSQL, ModelView):
@@ -278,24 +318,6 @@ class SearchingStart(ModelView):
             'readonly': Eval('lines', False),
             },
         depends=['lines'])
-    model = fields.Function(fields.Many2One('ir.model', 'Model'),
-        'on_change_with_model')
-    python_domain = fields.Function(fields.Boolean('Python Domain'),
-        'on_change_with_python_domain')
-    domain = fields.Text('Domain',
-        states={
-            'required': Eval('python_domain', False),
-            'invisible': Or(~Eval('profile'), ~Eval('python_domain', False)),
-            },
-        depends=['profile', 'python_domain'])
-    lines = fields.One2Many('searching.profile.line', None, 'Lines',
-        states={
-            'invisible': Or(~Eval('profile'), Eval('python_domain', False)),
-            },
-        context={
-            'model': Eval('model'),
-            },
-        depends=['profile', 'python_domain', 'model'],)
 
     @fields.depends('profile')
     def on_change_with_model(self, name=None):
@@ -343,38 +365,11 @@ class Searching(Wizard):
     def do_open_(self, action):
         Action = Pool().get('ir.action')
 
-        def get_domain(self):
-            if not self.python_domain:
-                condition_and = []
-                condition_or = []
-                for line in self.lines:
-                    field = line.field.name
-                    if line.subfield:
-                        field = '%s.%s' % (line.field.name, line.subfield.name)
-                    if line.condition == 'AND':
-                        condition_and.append(
-                            (field, line.operator, line.get_value()),
-                            )
-                    else:
-                        condition_or.append(
-                            (field, line.operator, line.get_value()),
-                            )
-
-                domain = []
-                if condition_or:
-                    condition_or.insert(0, 'OR')
-                    domain.append(condition_or)
-                if condition_and:
-                    domain.append(condition_and)
-            else:
-                domain = eval(self.domain)
-            return domain
-
         profile = self.start.profile
         model = profile.model
         model_model = profile.model.model
         Model = Pool().get(model_model)
-        domain = get_domain(self.start)
+        domain = profile.get_domain()
 
         if profile.action and profile.action.domain:
             domain = domain + eval(profile.action.domain)
