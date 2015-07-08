@@ -43,9 +43,7 @@ class SearchingProfile(ModelSQL, ModelView):
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
             },
-        depends=['model', 'python_domain'],
-        help='Python code that returns a variable called domain with a tryton '
-            'domain.')
+        depends=['model', 'python_domain'])
     lines = fields.One2Many('searching.profile.line', 'profile', 'Lines',
         states={
             'invisible': Or(~Eval('model'), Eval('python_domain', False)),
@@ -60,13 +58,6 @@ class SearchingProfile(ModelSQL, ModelView):
                 ),
             },
         help='User groups that will be able to use this search profile.')
-
-    @classmethod
-    def __setup__(cls):
-        super(SearchingProfile, cls).__setup__()
-        cls._error_messages.update({
-                'domain_field_error': ('Error in field domain: %s'),
-                })
 
     @staticmethod
     def default_python_domain():
@@ -86,37 +77,6 @@ class SearchingProfile(ModelSQL, ModelView):
                     line.operator, line.value))
 
         return ', '.join(condition)
-
-    def get_domain(self):
-        if not self.python_domain:
-            condition_and = []
-            condition_or = []
-            for line in self.lines:
-                field = line.field.name
-                if line.subfield:
-                    field = '%s.%s' % (line.field.name, line.subfield.name)
-                if line.condition == 'AND':
-                    condition_and.append(
-                        (field, line.operator, line.get_value()),
-                        )
-                else:
-                    condition_or.append(
-                        (field, line.operator, line.get_value()),
-                        )
-
-            domain = []
-            if condition_or:
-                condition_or.insert(0, 'OR')
-                domain.append(condition_or)
-            if condition_and:
-                domain.append(condition_and)
-        else:
-            try:
-                exec self.domain
-            except TypeError, e:
-                self.raise_user_error('domain_field_error',
-                    error_args=(e.message,))
-        return domain
 
 
 class SearchingProfileLine(ModelSQL, ModelView):
@@ -320,7 +280,7 @@ class Searching(Wizard):
             if condition_and:
                 domain.append(condition_and)
         else:
-            domain = self.start.profile.get_domain()
+            domain = eval(self.start.domain)
 
         try:
             records = Model.search(domain)
