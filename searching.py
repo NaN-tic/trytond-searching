@@ -48,7 +48,9 @@ class SearchingProfile(ModelSQL, ModelView):
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
             },
-        depends=['model', 'python_domain'])
+        depends=['model', 'python_domain'],
+        help="Return a domain with a list of tuples:\n" \
+            "domain = [(<field name>, <operator>, <operand>)]")
     lines = fields.One2Many('searching.profile.line', 'profile', 'Lines',
         states={
             'invisible': Or(~Eval('model'), Eval('python_domain', False)),
@@ -345,7 +347,9 @@ class SearchingStart(ModelView):
             'required': Eval('python_domain', False),
             'invisible': Or(~Eval('profile'), ~Eval('python_domain', False)),
             },
-        depends=['profile', 'python_domain'])
+        depends=['profile', 'python_domain'],
+        help="Return a domain with a list of tuples:\n" \
+            "domain = [(<field name>, <operator>, <operand>)]")
     lines = fields.One2Many('searching.profile.line', None, 'Lines',
         states={
             'invisible': Or(~Eval('profile'), Eval('python_domain', False)),
