@@ -76,7 +76,7 @@ class SearchingProfile(ModelSQL, ModelView):
         cls._error_messages.update({
                 'domain_field_error': 'Error in field domain: %s',
                 'domain_field_help': 'This field must returns a variable '
-                    'called domain with a tryton domain.'
+                    'called "domain" with a Tryton domain.'
                 })
 
     @staticmethod
