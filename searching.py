@@ -68,6 +68,15 @@ class SearchingProfile(ModelSQL, ModelView):
         depends=['model_name'],
         help='Action Window to display the results')
 
+    @classmethod
+    def __setup__(cls):
+        super(SearchingProfile, cls).__setup__()
+        cls._error_messages.update({
+                'domain_field_error': 'Error in field domain: %s',
+                'domain_field_help': 'This field must returns a variable '
+                    'called domain with a tryton domain.'
+                })
+
     @staticmethod
     def default_python_domain():
         return False
@@ -90,6 +99,55 @@ class SearchingProfile(ModelSQL, ModelView):
                     line.operator, line.value))
 
         return ', '.join(condition)
+
+    def get_domain(self):
+        if not self.python_domain:
+            domain = self.build_domain()
+        else:
+            domain = self.exec_domain()
+        if self.action and self.action.domain:
+            domain += eval(self.action.domain)
+        return domain
+
+    def build_domain(self, lines=None):
+        if lines is None:
+            lines = self.lines
+        condition_and = []
+        condition_or = []
+        for line in lines:
+            field = line.field.name
+            if line.subfield:
+                field = '%s.%s' % (line.field.name, line.subfield.name)
+            if line.condition == 'AND':
+                condition_and.append(
+                    (field, line.operator, line.get_value()),
+                    )
+            else:
+                condition_or.append(
+                    (field, line.operator, line.get_value()),
+                    )
+
+        domain = []
+        if condition_or:
+            condition_or.insert(0, 'OR')
+            domain.append(condition_or)
+        if condition_and:
+            domain.append(condition_and)
+        return domain
+
+    def exec_domain(self, domain=None):
+        if domain is None:
+            domain = self.domain
+        try:
+            exec domain
+        except TypeError, e:
+            self.raise_user_error('domain_field_error',
+                error_args=(e.message,))
+        if not domain:
+            self.raise_user_error('domain_field_error',
+                error_args=(self.raise_user_error('domain_field_help',
+                    raise_exception=False),))
+        return domain
 
 
 class SearchingProfileLine(ModelSQL, ModelView):
@@ -343,38 +401,15 @@ class Searching(Wizard):
     def do_open_(self, action):
         Action = Pool().get('ir.action')
 
-        def get_domain(self):
-            if not self.python_domain:
-                condition_and = []
-                condition_or = []
-                for line in self.lines:
-                    field = line.field.name
-                    if line.subfield:
-                        field = '%s.%s' % (line.field.name, line.subfield.name)
-                    if line.condition == 'AND':
-                        condition_and.append(
-                            (field, line.operator, line.get_value()),
-                            )
-                    else:
-                        condition_or.append(
-                            (field, line.operator, line.get_value()),
-                            )
-
-                domain = []
-                if condition_or:
-                    condition_or.insert(0, 'OR')
-                    domain.append(condition_or)
-                if condition_and:
-                    domain.append(condition_and)
-            else:
-                domain = eval(self.domain)
-            return domain
-
         profile = self.start.profile
         model = profile.model
         model_model = profile.model.model
         Model = Pool().get(model_model)
-        domain = get_domain(self.start)
+
+        if not self.start.python_domain:
+            domain = profile.build_domain(self.start.lines)
+        else:
+            domain = profile.exec_domain(self.start.domain)
 
         if profile.action and profile.action.domain:
             domain = domain + eval(profile.action.domain)
