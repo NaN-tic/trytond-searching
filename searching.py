@@ -266,7 +266,7 @@ class SearchingProfileLine(ModelSQL, ModelView):
                 'date', 'datetime', 'timestamp'):
             return getattr(self, 'get_value_%s' % self.field_type)()
         elif self.field_type in ('char', 'text', 'selection', 'reference',
-                'many2one'):
+                'many2one', 'one2many'):
             return self.value
         self.raise_user_error('not_implemented_error',
             error_args=(self.field_type,))
