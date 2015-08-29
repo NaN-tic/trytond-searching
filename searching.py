@@ -281,7 +281,7 @@ class SearchingProfileLine(ModelSQL, ModelView):
 
     @fields.depends('field')
     def on_change_field(self):
-        return {'subfield': None}
+        self.subfield = None
 
     @fields.depends('field')
     def on_change_with_field_type(self, name=None):
