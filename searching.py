@@ -9,6 +9,7 @@ from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, PYSONEncoder, Id, Or
+from sql import Query
 
 __all__ = ['SearchingProfile', 'SearchingProfileLine',
     'SearchingProfileGroup', 'SearchingStart', 'Searching', 'Model']
@@ -149,6 +150,13 @@ class SearchingProfile(ModelSQL, ModelView):
             self.raise_user_error('domain_field_error',
                 error_args=(self.raise_user_error('domain_field_help',
                     raise_exception=False),))
+
+        if isinstance(domain[0][2], Query):
+            cursor = Transaction().cursor
+            cursor.execute(*domain[0][2])
+            ids = cursor.fetchall()
+            domain = [(domain[0][0], domain[0][1], [i[0] for i in ids])]
+
         return domain
 
 
