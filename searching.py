@@ -152,7 +152,7 @@ class SearchingProfile(ModelSQL, ModelView):
                     raise_exception=False),))
 
         if isinstance(domain[0][2], Query):
-            cursor = Transaction().cursor
+            cursor = Transaction().connection.cursor()
             cursor.execute(*domain[0][2])
             ids = cursor.fetchall()
             domain = [(domain[0][0], domain[0][1], [i[0] for i in ids])]
