@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- This file is part pyme module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data depends="purchase">
+        <menuitem
+            id="menu_act_searching_purchase"
+            parent="purchase.menu_purchase"
+            action="searching.act_searching"
+            icon="tryton-find"/>
+    </data>
+</tryton>
