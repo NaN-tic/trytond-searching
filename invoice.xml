@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- This file is part searching module for Tryton.
+The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <menuitem
+        id="menu_act_searching_invoice"
+        parent="account_invoice.menu_invoices"
+        action="searching.act_searching"
+        icon="tryton-find"/>
+</tryton>
