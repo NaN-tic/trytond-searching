@@ -13,7 +13,6 @@ from sql import Query
 
 __all__ = ['SearchingProfile', 'SearchingProfileLine',
     'SearchingProfileGroup', 'SearchingStart', 'Searching', 'Model']
-__metaclass__ = PoolMeta
 
 _OPERATORS = [
     ('=', '='),
@@ -457,7 +456,8 @@ class Searching(Wizard):
             }, {}
 
 
-class Model(ModelSQL, ModelView):
+class Model:
+    __metaclass__ = PoolMeta
     __name__ = 'ir.model'
     searching_enabled = fields.Boolean('Searching Enabled',
         help='Check if you want this model to be available in '
