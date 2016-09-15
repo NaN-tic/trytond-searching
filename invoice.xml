@@ -2,7 +2,7 @@
 <!-- This file is part searching module for Tryton.
 The COPYRIGHT file at the top level of this repository contains the full copyright notices and license terms. -->
 <tryton>
-    <data depends="account_invoice">
+    <data>
         <menuitem
             id="menu_act_searching_invoice"
             parent="account_invoice.menu_invoices"
