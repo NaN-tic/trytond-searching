@@ -3,7 +3,7 @@
 # the full copyright notices and license terms.
 from datetime import datetime
 from decimal import Decimal
-from trytond.model import ModelView, ModelSQL, fields
+from trytond.model import ModelView, ModelSQL, sequence_ordered, fields
 from trytond.model.fields import depends
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
@@ -49,8 +49,8 @@ class SearchingProfile(ModelSQL, ModelView):
             'invisible': Or(~Eval('model'), ~Eval('python_domain', False)),
             },
         depends=['model', 'python_domain'],
-        help="Return a domain with a list of tuples:\n" \
-            "domain = [(<field name>, <operator>, <operand>)]")
+        help="Return a domain with a list of tuples:\n"
+        "domain = [(<field name>, <operator>, <operand>)]")
     lines = fields.One2Many('searching.profile.line', 'profile', 'Lines',
         states={
             'invisible': Or(~Eval('model'), Eval('python_domain', False)),
@@ -75,8 +75,8 @@ class SearchingProfile(ModelSQL, ModelView):
         super(SearchingProfile, cls).__setup__()
         cls._error_messages.update({
                 'domain_field_error': 'Error in field domain: %s',
-                'domain_field_help': 'This field must returns a variable '
-                    'called "domain" with a Tryton domain.'
+                'domain_field_help': ('This field must returns a variable '
+                    'called "domain" with a Tryton domain.'),
                 })
 
     @staticmethod
@@ -159,12 +159,11 @@ class SearchingProfile(ModelSQL, ModelView):
         return domain
 
 
-class SearchingProfileLine(ModelSQL, ModelView):
+class SearchingProfileLine(sequence_ordered(), ModelSQL, ModelView):
     'Searching Profile Line'
     __name__ = 'searching.profile.line'
     profile = fields.Many2One('searching.profile', 'Profile',
         ondelete='CASCADE', select=True)
-    sequence = fields.Integer('Sequence')
     condition = fields.Selection([
             ('AND', 'AND'),
             ('OR', 'OR'),
@@ -191,37 +190,27 @@ class SearchingProfileLine(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(SearchingProfileLine, cls).__setup__()
-        cls._order.insert(0, ('sequence', 'ASC'))
         cls._error_messages.update({
-                'not_implemented_error':
-                    'Error. Field of type %s is not implemented yet.',
-                'datetime_format_error':
+                'not_implemented_error': (
+                    'Error. Field of type %s is not implemented yet.'),
+                'datetime_format_error': (
                     'Error building domain of type DateTime or Timestamp. '
                     'Please, check the format:\n\n'
                     'Field: \'%s\'\n'
                     'Value: \'%s\'\n'
-                    'Format: \'%%d/%%m/%%Y %%H:%%M:%%S\'',
-                'date_format_error':
+                    'Format: \'%%d/%%m/%%Y %%H:%%M:%%S\''),
+                'date_format_error': (
                     'Error building domain of type Date. '
                     'Please, check the format:\n\n'
                     'Field: \'%s\'\n'
                     'Value: \'%s\'\n'
-                    'Format: \'%%d/%%m/%%Y\'',
-                'number_format_error':
+                    'Format: \'%%d/%%m/%%Y\''),
+                'number_format_error': (
                     'Error building domain of type Float. '
                     'Please, ensure you have put a number.\n\n'
                     'Field: \'%s\'\n'
-                    'Value: \'%s\'\n',
+                    'Value: \'%s\'\n'),
                 })
-
-    @staticmethod
-    def order_sequence(tables):
-        table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
-
-    @staticmethod
-    def default_sequence():
-        return 0
 
     @staticmethod
     def default_condition():
@@ -355,8 +344,8 @@ class SearchingStart(ModelView):
             'invisible': Or(~Eval('profile'), ~Eval('python_domain', False)),
             },
         depends=['profile', 'python_domain'],
-        help="Return a domain with a list of tuples:\n" \
-            "domain = [(<field name>, <operator>, <operand>)]")
+        help="Return a domain with a list of tuples:\n"
+        "domain = [(<field name>, <operator>, <operand>)]")
     lines = fields.One2Many('searching.profile.line', None, 'Lines',
         states={
             'invisible': Or(~Eval('profile'), Eval('python_domain', False)),
