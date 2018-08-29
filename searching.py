@@ -285,7 +285,7 @@ class SearchingProfileLine(sequence_ordered(), ModelSQL, ModelView):
             return self.field.ttype
         return ''
 
-    @fields.depends('field', '_parent_profile.model')
+    @fields.depends('field', 'profile', '_parent_profile.model')
     def on_change_with_submodel(self, name=None):
         Model = Pool().get('ir.model')
         if getattr(self, 'profile'):
