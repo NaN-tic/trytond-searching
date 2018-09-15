@@ -141,8 +141,8 @@ class SearchingProfile(ModelSQL, ModelView):
         if domain is None:
             domain = self.domain
         try:
-            exec domain
-        except TypeError, e:
+            exec(domain)
+        except TypeError as e:
             self.raise_user_error('domain_field_error',
                 error_args=(e.message,))
         if not domain:
@@ -445,8 +445,7 @@ class Searching(Wizard):
             }, {}
 
 
-class Model:
-    __metaclass__ = PoolMeta
+class Model(metaclass=PoolMeta):
     __name__ = 'ir.model'
     searching_enabled = fields.Boolean('Searching Enabled',
         help='Check if you want this model to be available in '
