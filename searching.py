@@ -9,6 +9,8 @@ from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
 from trytond.pyson import Eval, PYSONEncoder, Id, Or
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 from sql import Query
 
 __all__ = ['SearchingProfile', 'SearchingProfileLine',
@@ -69,15 +71,6 @@ class SearchingProfile(ModelSQL, ModelView):
         domain=[('res_model', '=', Eval('model_name'))],
         depends=['model_name'],
         help='Action Window to display the results')
-
-    @classmethod
-    def __setup__(cls):
-        super(SearchingProfile, cls).__setup__()
-        cls._error_messages.update({
-                'domain_field_error': 'Error in field domain: %s',
-                'domain_field_help': ('This field must returns a variable '
-                    'called "domain" with a Tryton domain.'),
-                })
 
     @staticmethod
     def default_python_domain():
@@ -143,13 +136,10 @@ class SearchingProfile(ModelSQL, ModelView):
         try:
             exec(domain)
         except TypeError as e:
-            self.raise_user_error('domain_field_error',
-                error_args=(e.message,))
+            raise UserError(gettext('searching.msg_domain_field_error',
+                error='%s' % (e.message,)))
         if not domain:
-            self.raise_user_error('domain_field_error',
-                error_args=(self.raise_user_error('domain_field_help',
-                    raise_exception=False),))
-
+            raise UserError(gettext('searching.msg_domain_field_help'))
         if isinstance(domain[0][2], Query):
             cursor = Transaction().connection.cursor()
             cursor.execute(*domain[0][2])
@@ -187,31 +177,6 @@ class SearchingProfileLine(sequence_ordered(), ModelSQL, ModelView):
     operator = fields.Selection(_OPERATORS, 'Operator', required=True)
     value = fields.Char('Value')
 
-    @classmethod
-    def __setup__(cls):
-        super(SearchingProfileLine, cls).__setup__()
-        cls._error_messages.update({
-                'not_implemented_error': (
-                    'Error. Field of type %s is not implemented yet.'),
-                'datetime_format_error': (
-                    'Error building domain of type DateTime or Timestamp. '
-                    'Please, check the format:\n\n'
-                    'Field: \'%s\'\n'
-                    'Value: \'%s\'\n'
-                    'Format: \'%%d/%%m/%%Y %%H:%%M:%%S\''),
-                'date_format_error': (
-                    'Error building domain of type Date. '
-                    'Please, check the format:\n\n'
-                    'Field: \'%s\'\n'
-                    'Value: \'%s\'\n'
-                    'Format: \'%%d/%%m/%%Y\''),
-                'number_format_error': (
-                    'Error building domain of type Float. '
-                    'Please, ensure you have put a number.\n\n'
-                    'Field: \'%s\'\n'
-                    'Value: \'%s\'\n'),
-                })
-
     @staticmethod
     def default_condition():
         return 'AND'
@@ -223,36 +188,41 @@ class SearchingProfileLine(sequence_ordered(), ModelSQL, ModelView):
         try:
             return int(self.value)
         except ValueError:
-            self.raise_user_error('number_format_error',
-                error_args=(self.field.name, self.value))
+            raise UserError(gettext('searching.msg_number_format_error',
+                field=self.field.name,
+                value=self.value))
 
     def get_value_float(self):
         try:
             return float(self.value)
         except ValueError:
-            self.raise_user_error('number_format_error',
-                error_args=(self.field.name, self.value))
+            raise UserError(gettext('searching.msg_number_format_error',
+                field=self.field.name,
+                value=self.value))
 
     def get_value_numeric(self):
         try:
             return Decimal(self.value)
         except ValueError:
-            self.raise_user_error('number_format_error',
-                error_args=(self.field.name, self.value))
+            raise UserError(gettext('searching.msg_number_format_error',
+                field=self.field.name,
+                value=self.value))
 
     def get_value_date(self):
         try:
             return datetime.strptime(self.value, '%d/%m/%Y').date()
         except ValueError:
-            self.raise_user_error('date_format_error',
-                error_args=(self.field.name, self.value))
+            raise UserError(gettext('searching.msg_date_format_error',
+                field=self.field.name,
+                value=self.value))
 
     def get_value_datetime(self):
         try:
             return datetime.strptime(self.value, '%d/%m/%Y %H:%M:%S')
         except ValueError:
-            self.raise_user_error('datetime_format_error',
-                error_args=(self.field.name, self.value))
+            raise UserError(gettext('searching.msg_datetime_format_error',
+                field=self.field.name,
+                value=self.value))
 
     def get_value_timestamp(self):
         return self.get_value_datetime()
@@ -264,8 +234,9 @@ class SearchingProfileLine(sequence_ordered(), ModelSQL, ModelView):
         elif self.field_type in ('char', 'text', 'selection', 'reference',
                 'many2one', 'one2many'):
             return self.value
-        self.raise_user_error('not_implemented_error',
-            error_args=(self.field_type,))
+        raise UserError(gettext('searching.msg_not_implemented_error',
+            field=self.field.name))
+
 
     def get_rec_name(self, name):
         if self.subfield:
@@ -391,13 +362,6 @@ class Searching(Wizard):
             ])
     open_ = EmptyStateAction()
 
-    @classmethod
-    def __setup__(cls):
-        super(Searching, cls).__setup__()
-        cls._error_messages.update({
-                'error_domain': ('Error domain "%s"'),
-                })
-
     def do_open_(self, action):
         Action = Pool().get('ir.action')
 
@@ -418,7 +382,8 @@ class Searching(Wizard):
             Model.search(domain)
         except:
             with Transaction().new_cursor():
-                self.raise_user_error('error_domain', str(domain))
+                raise UserError(gettext('searching.msg_error_domain',
+                    domain=str(domain)))
 
         # return custom action window
         if profile.action:
